@@ -90,24 +90,6 @@ Each song becomes a node placed at its 3D UMAP coordinates. Edges are drawn betw
 .venv/bin/python3.12 visualize.py
 ```
 
-Then open `song_graph.html` in any modern browser.
+Then open `song_graph.html` in any browser.
 
 ---
-
-## Dependencies
-
-```
-librosa
-numpy
-pandas
-scikit-learn
-umap-learn
-hdbscan
-matplotlib
-```
-
-Install into the virtual environment:
-
-```bash
-.venv/bin/pip install librosa numpy pandas scikit-learn umap-learn hdbscan matplotlib
-```

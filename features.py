@@ -15,11 +15,15 @@ CSV_OUTPUT = "features.csv"
 # HELPERS
 # =========================
 
-KEY_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+KEY_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 
 # Krumhansl-Schmuckler key profiles
-_MAJOR = np.array([6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88])
-_MINOR = np.array([6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17])
+_MAJOR = np.array(
+    [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
+)
+_MINOR = np.array(
+    [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
+)
 
 
 def _estimate_key(chroma_mean: np.ndarray) -> tuple[str, str]:
@@ -77,6 +81,7 @@ def extract_features(mp3_path: str) -> dict | None:
 # MAIN
 # =========================
 
+
 def _process_file(mp3_file: Path) -> tuple[str, dict] | None:
     print(f"\nProcessing: {mp3_file.name}")
     try:
@@ -110,7 +115,9 @@ def main():
     with multiprocessing.Pool() as pool:
         results = pool.map(_process_file, mp3_files)
 
-    all_results = {name: row for result in results if result is not None for name, row in [result]}
+    all_results = {
+        name: row for result in results if result is not None for name, row in [result]
+    }
 
     if all_results:
         fieldnames = ["track"] + list(next(iter(all_results.values())).keys())

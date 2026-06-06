@@ -11,14 +11,32 @@ df = pd.read_csv("features.csv")
 tracks = df["track"]
 
 # Encode key and mode as numeric
-key_map = {"C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5,
-           "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11}
+key_map = {
+    "C": 0,
+    "C#": 1,
+    "D": 2,
+    "D#": 3,
+    "E": 4,
+    "F": 5,
+    "F#": 6,
+    "G": 7,
+    "G#": 8,
+    "A": 9,
+    "A#": 10,
+    "B": 11,
+}
 df["key_num"] = df["key"].map(key_map).fillna(-1)
 df["mode_num"] = (df["mode"] == "major").astype(int)
 
 feature_cols = [
-    "tempo", "beat_strength", "energy", "spectral_centroid",
-    "spectral_rolloff", "zero_crossing_rate", "key_num", "mode_num",
+    "tempo",
+    "beat_strength",
+    "energy",
+    "spectral_centroid",
+    "spectral_rolloff",
+    "zero_crossing_rate",
+    "key_num",
+    "mode_num",
     *[c for c in df.columns if c.startswith("mfcc_")],
 ]
 
@@ -40,26 +58,30 @@ clusterer = hdbscan.HDBSCAN(min_cluster_size=10, min_samples=2, prediction_data=
 labels = clusterer.fit_predict(X_hd)
 
 n_noise = (labels == -1).sum()
-print(f"Before reassignment: {n_noise} noise points ({n_noise/len(labels):.1%})")
+print(f"Before reassignment: {n_noise} noise points ({n_noise / len(labels):.1%})")
 
 # Assign noise points to their nearest cluster via membership vectors
 membership = hdbscan.all_points_membership_vectors(clusterer)
-labels = np.array([
-    int(np.argmax(membership[i])) if labels[i] == -1 else labels[i]
-    for i in range(len(labels))
-])
+labels = np.array(
+    [
+        int(np.argmax(membership[i])) if labels[i] == -1 else labels[i]
+        for i in range(len(labels))
+    ]
+)
 
 n_clusters = len(set(labels))
 print(f"After reassignment: {n_clusters} clusters, 0 noise points")
 
 # --- Save results ---
-out = pd.DataFrame({
-    "track": tracks,
-    "cluster": labels,
-    "x": X_3d[:, 0],
-    "y": X_3d[:, 1],
-    "z": X_3d[:, 2],
-})
+out = pd.DataFrame(
+    {
+        "track": tracks,
+        "cluster": labels,
+        "x": X_3d[:, 0],
+        "y": X_3d[:, 1],
+        "z": X_3d[:, 2],
+    }
+)
 out.to_csv("clusters_3d.csv", index=False)
 print("Saved clusters_3d.csv")
 
@@ -71,9 +93,13 @@ colors = cm.tab20(np.linspace(0, 1, max(n_clusters, 1)))
 for i, cluster_id in enumerate(sorted(set(labels))):
     mask = labels == cluster_id
     ax.scatter(
-        X_3d[mask, 0], X_3d[mask, 1], X_3d[mask, 2],
-        color=colors[i % len(colors)], s=15, alpha=0.7,
-        label=f"Cluster {cluster_id} (n={mask.sum()})"
+        X_3d[mask, 0],
+        X_3d[mask, 1],
+        X_3d[mask, 2],
+        color=colors[i % len(colors)],
+        s=15,
+        alpha=0.7,
+        label=f"Cluster {cluster_id} (n={mask.sum()})",
     )
 
 ax.set_title(f"Song Clusters ({n_clusters} clusters, {len(tracks)} songs)", fontsize=14)

@@ -11,30 +11,51 @@ nodes = []
 cluster_ids = sorted(df["cluster"].unique())
 
 PALETTE = [
-    "#e6194b","#3cb44b","#ffe119","#4363d8","#f58231",
-    "#911eb4","#42d4f4","#f032e6","#bfef45","#fabed4",
-    "#469990","#dcbeff","#9a6324","#fffac8","#800000",
-    "#aaffc3","#808000","#ffd8b1","#000075","#a9a9a9",
+    "#e6194b",
+    "#3cb44b",
+    "#ffe119",
+    "#4363d8",
+    "#f58231",
+    "#911eb4",
+    "#42d4f4",
+    "#f032e6",
+    "#bfef45",
+    "#fabed4",
+    "#469990",
+    "#dcbeff",
+    "#9a6324",
+    "#fffac8",
+    "#800000",
+    "#aaffc3",
+    "#808000",
+    "#ffd8b1",
+    "#000075",
+    "#a9a9a9",
 ]
-cluster_color = {int(cid): PALETTE[i % len(PALETTE)] for i, cid in enumerate(c for c in cluster_ids if c != -1)}
+cluster_color = {
+    int(cid): PALETTE[i % len(PALETTE)]
+    for i, cid in enumerate(c for c in cluster_ids if c != -1)
+}
 cluster_color[-1] = "#555555"
 
 for i, row in df.iterrows():
-    nodes.append({
-        "id": i,
-        "label": row["track"],
-        "cluster": int(row["cluster"]),
-        "color": cluster_color[int(row["cluster"])],
-        "x": float(row["x"]),
-        "y": float(row["y"]),
-        "z": float(row["z"]),
-    })
+    nodes.append(
+        {
+            "id": i,
+            "label": row["track"],
+            "cluster": int(row["cluster"]),
+            "color": cluster_color[int(row["cluster"])],
+            "x": float(row["x"]),
+            "y": float(row["y"]),
+            "z": float(row["z"]),
+        }
+    )
 
 print("Computing KNN edges...")
 edges = set()
 for i in range(len(coords)):
     diffs = coords - coords[i]
-    dists = (diffs ** 2).sum(axis=1)
+    dists = (diffs**2).sum(axis=1)
     dists[i] = np.inf
     nearest = np.argpartition(dists, K)[:K]
     for j in nearest:
