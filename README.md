@@ -91,5 +91,3 @@ Each song becomes a node placed at its 3D UMAP coordinates. Edges are drawn betw
 ```
 
 Then open `song_graph.html` in any browser.
-
----
